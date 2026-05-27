@@ -108,7 +108,7 @@ class ChatCompletionResponseMessageAnnotation(TypedDict):
 
 class ChatCompletionResponseMessage(TypedDict):
     content: Optional[str]
-    refusal: Optional[str]
+    refusal: NotRequired[Optional[str]]
     role: Literal["assistant"]
     tool_calls: NotRequired["ChatCompletionMessageToolCalls"]
     annotations: NotRequired[List[ChatCompletionResponseMessageAnnotation]]
@@ -427,7 +427,7 @@ class ChatCompletionRequestAssistantMessageFunctionCall(TypedDict):
 class ChatCompletionRequestAssistantMessage(TypedDict):
     """Messages sent by the model in response to user messages."""
     role: Literal["assistant"]
-    name: Optional[str]
+    name: NotRequired[Optional[str]]
     content: NotRequired[Optional[str]]
     refusal: NotRequired[Optional[str]]
     tool_calls: NotRequired[ChatCompletionMessageToolCalls]

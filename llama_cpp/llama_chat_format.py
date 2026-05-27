@@ -678,7 +678,7 @@ def chat_formatter_to_chat_completion_handler(
         if result.stopping_criteria is not None:
             stopping_criteria = result.stopping_criteria
 
-        if response_format is not None and response_format["type"] == "json_object":
+        if response_format is not None and response_format["type"] in ("json_object", "json_schema"):
             grammar = _grammar_for_response_format(
                 response_format, verbose=llama.verbose
             )
@@ -1034,8 +1034,15 @@ def _grammar_for_response_format(
     response_format: llama_types.ChatCompletionRequestResponseFormat,
     verbose: bool = False,
 ):
-    if response_format["type"] != "json_object":
+    if response_format["type"] not in ("json_object", "json_schema"):
         return None
+
+    if response_format["type"] == "json_schema" and "json_schema" in response_format:
+        json_schema = response_format["json_schema"]
+        if "schema" in json_schema:
+            return _grammar_for_json_schema(
+                json.dumps(json_schema["schema"]), verbose=verbose
+            )
 
     if "schema" in response_format:
         return _grammar_for_json_schema(
@@ -3486,7 +3493,7 @@ while also answering every question accurately, clearly, and step-by-step when a
             bitmap_array = None
 
         # Handle response format and tools (same as before)
-        if response_format is not None and response_format["type"] == "json_object":
+        if response_format is not None and response_format["type"] in ("json_object", "json_schema"):
             grammar = _grammar_for_response_format(response_format)
 
         # Convert legacy functions to tools
@@ -6160,7 +6167,7 @@ def chatml_function_calling(
             add_generation_prompt=True,
         )
 
-        if response_format is not None and response_format["type"] == "json_object":
+        if response_format is not None and response_format["type"] in ("json_object", "json_schema"):
             grammar = _grammar_for_response_format(response_format)
 
         return _convert_completion_to_chat(
